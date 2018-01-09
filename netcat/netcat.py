@@ -54,8 +54,38 @@ def client_sender(buffer):
       client.close()
 
 def server_loop():
-   # TODO: 後で
+   global target
 
+   # 待機するIPアドレスが指定されていない場合は、全てのインタフェースで接続を待機
+   if not len(target):
+      target = "0.0.0.0"
+
+   server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+   server.bind((target, port))
+
+   server.listen(5)
+
+   while True:
+      client.socket, addr = server.accept()
+
+      # クライアントからの新しい接続を処理するスレッドの起動
+      client_thread = threading.Thread(target=client_handler, args=(client_socket,))
+      client_thread.start()
+
+def run_command(command):
+   # 文字列の末尾の開業を削除
+   command = command.rstrip()
+
+   # コマンドを実行し出力を取得
+   try:
+      output = subprocess.check_output(
+         command,stderr=subprocess.STDOUT, shell=True)
+
+   except:
+      output = "Failed to execute command. \r\n"
+
+   # 出力結果をクライアントに送信
+   return output
 
 def main():
    global listen
