@@ -21,7 +21,37 @@ def usage ():
 
 
 def client_sender(buffer):
-   # TODO: 後で
+   client = socket.socket(socket.AF_INET, soccket.SOCK.STREAM)
+   try:
+      # 標的ホストへの接続
+      client.connect((target, port))
+
+      if len(buffer):
+         client.send(buffer)
+
+      while True:
+         # 標的ホストからのデータを待機
+         recv_len = 1
+         response = ""
+
+         while recv_len:
+            data      = client.recv(4096)
+            recv_len  = len(data)
+            response += data
+            if recv_len < 4096:
+               break
+         print response,
+
+         # 追加の入力を待機
+         buffer = raw_input("")
+         buffer += "\n"
+
+         # データの送信
+         client.send(buffer)
+   except:
+      print "[*] Exception Exiting."
+      #接続の終了
+      client.close()
 
 def server_loop():
    # TODO: 後で
@@ -80,7 +110,7 @@ def main():
       # 接続待機を開始
       # コマンドラインオプションに応じて、ファイルをアップロード
       # コマンド実行、￥コマンドシェルの実行。
-      if listen:
+      if listen: 2
          server_loop()
 
    main()
