@@ -14,6 +14,7 @@ target             = ""
 upload_destination = ""
 port               = 0
 
+main()
 
 def usage ():
    print "FIXME"
@@ -72,6 +73,8 @@ def server_loop():
       client_thread = threading.Thread(target=client_handler, args=(client_socket,))
       client_thread.start()
 
+
+
 def run_command(command):
    # 文字列の末尾の開業を削除
    command = command.rstrip()
@@ -86,6 +89,65 @@ def run_command(command):
 
    # 出力結果をクライアントに送信
    return output
+
+def client_handler(client_socket):
+   global upload
+   global execute
+   global command
+
+   # ファイルアップロードを指定されているかどうかを確認
+   if len(upload_destination):
+
+      # 全てのデータを読み取り、指定されたファイルにデータを書き込み
+      file_buffer = ""
+
+      # 受信データがなくなるまでデータ受信を継続
+
+      while True:
+         data = client_socket.recv(1024)
+
+           if len(data) == 0:
+              break
+           else :
+              file_buffer += data
+
+      # 受信したデータをファイルに書き込み
+      try:
+         file_descriptor = open(upload_destination, "wb")
+         file_descriptor.write(file_buffer)
+         file_descriptor.close()
+
+         # ファイルの書き込みの成否を通知
+         client_socket.send("Successfully saved file to %s\r\n" % upload_destination)
+
+      except:
+         client_socket.send("Failed to save file to %s\r\n" % upload_destination)
+
+   if len(execute):
+
+      # コマンドの実行
+      output = run_command(execute)
+      client_socket.send(output)
+
+   # コマンドシェルの実行を指定されている場合の処理
+   if command:
+      prompt = "<BHP:#>"
+      client_socket.send(prompt)
+
+      while True:
+         # 改行(Enter) を受け取るまでデータの受信
+         cmd_buffer = ""
+
+         while "\n" not in cmd_buffer:
+            cmd_buffer += client_socket.recv(1024)
+
+         # コマンド実行結果の取得
+         response = run_command(cmd_buffer)
+         response += prompt
+
+         # コマンドの実行結果を送信
+         client_socket.send(response)
+
 
 def main():
    global listen
@@ -139,8 +201,6 @@ def main():
 
       # 接続待機を開始
       # コマンドラインオプションに応じて、ファイルをアップロード
-      # コマンド実行、￥コマンドシェルの実行。
+      # コマンド実行、コマンドシェルの実行。
       if listen: 2
          server_loop()
-
-   main()
