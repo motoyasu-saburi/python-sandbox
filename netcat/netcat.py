@@ -6,53 +6,54 @@ import getopt
 import threading
 import subprocess
 
-listen             = False
-command            = False
-upload             = False
-execute            = ""
-target             = ""
+listen = False
+command = False
+upload = False
+execute = ""
+target = ""
 upload_destination = ""
-port               = 0
+port = 0
 
-main()
+
 
 def usage ():
-   print "FIXME"
-   sys.exit(0)
+    print "FIXME"
+    sys.exit(0)
 
 
 def client_sender(buffer):
-   client = socket.socket(socket.AF_INET, soccket.SOCK.STREAM)
-   try:
-      # 標的ホストへの接続
-      client.connect((target, port))
+    client = socket.socket(socket.AF_INET, soccket.SOCK.STREAM)
+    try:
+        # 標的ホストへの接続
+        client.connect((target, port))
 
-      if len(buffer):
-         client.send(buffer)
+        if len(buffer):
+            client.send(buffer)
 
-      while True:
-         # 標的ホストからのデータを待機
-         recv_len = 1
-         response = ""
+        while True:
+            # 標的ホストからのデータを待機
+            recv_len = 1
+            response = ""
 
-         while recv_len:
-            data      = client.recv(4096)
-            recv_len  = len(data)
-            response += data
-            if recv_len < 4096:
-               break
-         print response,
+            while recv_len:
+                data = client.recv(4096)
+                recv_len = len(data)
+                response += data
+                if recv_len < 4096:
+                    break
+                print response,
 
-         # 追加の入力を待機
-         buffer = raw_input("")
-         buffer += "\n"
+            # 追加の入力を待機
+            buffer = raw_input("")
+            buffer += "\n"
 
-         # データの送信
-         client.send(buffer)
-   except:
-      print "[*] Exception Exiting."
-      #接続の終了
-      client.close()
+            # データの送信
+            client.send(buffer)
+
+    except:
+       print "[*] Exception Exiting."
+       #接続の終了
+       # client.close()
 
 def server_loop():
    global target
@@ -106,10 +107,10 @@ def client_handler(client_socket):
       while True:
          data = client_socket.recv(1024)
 
-           if len(data) == 0:
-              break
-           else :
-              file_buffer += data
+         if len(data) == 0:
+            break
+         else :
+            file_buffer += data
 
       # 受信したデータをファイルに書き込み
       try:
@@ -176,7 +177,7 @@ def main():
          usage()
       elif o in ("-l", "--listen"):
          listen = True
-      elif o in ("-e", "--execute")
+      elif o in ("-e", "--execute"):
          execute = a
       elif o in ("-c", "--commandshell"):
          command = True
@@ -203,4 +204,7 @@ def main():
       # コマンドラインオプションに応じて、ファイルをアップロード
       # コマンド実行、コマンドシェルの実行。
       if listen: 2
-         server_loop()
+      server_loop()
+
+
+main()
