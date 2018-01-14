@@ -30,3 +30,33 @@ def server_loop(local_host, local_port, remote_host, remote_port, receive_first)
       args=(client_socket, remotehost, remote_port, receive_first))
 
     proxy_thread.start()
+
+def main():
+
+  # コマンドライン引数の解釈
+if len(sys.argv[1:]) != 5:
+  print "Usage: ./proxy.py 127.0.0.1 9000 10.12.132.1 9000 True"
+  sys.exit(0)
+
+  # ローカル側での通信待受を行うための設定
+  local_host = sys.argv[1]
+  local_port = int(sys.argv[2])
+
+  # リモート側の設定
+  remote_host = sys.argv[3]
+  remote_port = int(sys.argv[2])
+
+  # リモート側にデータを送る前にデータ受信を行うかどうかの設定
+  receive_first = sys.argv[5]
+
+  if "True" in receive_first:
+    receive_first = True
+  else:
+    receive_first = False
+
+  # 通信待機ソケットの起動
+  server_loop(local_host, local_port, remote_host, remote_port, receive_first)
+
+
+main()
+
