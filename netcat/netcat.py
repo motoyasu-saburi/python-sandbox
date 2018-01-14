@@ -22,7 +22,7 @@ def usage ():
 
 
 def client_sender(buffer):
-    client = socket.socket(socket.AF_INET, soccket.SOCK.STREAM)
+    client = socket.socket(socket.AF_INET, socket.SOCK.STREAM)
     try:
         # 標的ホストへの接続
         client.connect((target, port))
@@ -55,7 +55,7 @@ def client_sender(buffer):
        #接続の終了
        # client.close()
 
-def server_loop():
+def server_loop(client_socket):
    global target
 
    # 待機するIPアドレスが指定されていない場合は、全てのインタフェースで接続を待機
