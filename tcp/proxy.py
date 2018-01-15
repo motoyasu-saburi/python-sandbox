@@ -4,6 +4,21 @@ import sys
 import  socket
 import threading
 
+def receive_from(remote_socket):
+  # TODO
+  pass
+
+
+def hexdump(remote_buffer):
+  # TODO
+  pass
+
+
+def response_handler(remote_buffer):
+  # TODO
+  pass
+
+
 def proxy_handler(client_socket, remote_host, remote_port, receive_first):
   # リモートホストへの接続
   remote_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
