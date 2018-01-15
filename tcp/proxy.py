@@ -5,7 +5,61 @@ import  socket
 import threading
 
 def proxy_handler(client_socket, remote_host, remote_port, receive_first):
-  # TODO
+  # リモートホストへの接続
+  remote_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+  remote_socket.connect((remote_host, remote_port))
+
+  # 必要ならリモートホストからデータを受信
+  if receive_first:
+    remote_buffer = receive_from(remote_socket)
+    hexdump(remote_buffer)
+
+    # 受信データ処理関数にデータ受け渡し
+    remote_buffer = response_handler(remote_buffer)
+
+    # ローカル側に対してデータ受け渡し
+    remote_buffer = response_handler(remote_socket)
+
+    # もしローカル側に対して送るデータがあれば送信
+    if len(remote_buffer):
+      print "[<==] Sending %d bytes to localhost." % len(remote_buffer)
+      client_socket.send(remote_buffer)
+
+  # 「ローカル側に対して送るデータがあれば送信」　の繰り返しを行うループ処理を開始
+  while True:
+    # ローカルホストからデータ受信
+    local_buffer = receive_from(client_socket)
+
+    if len(local_buffer):
+      print "[==>] Received %d bytes from localhost." % len(local_buffer)
+      hexdump(local_buffer)
+
+      # リモートホストへのデータ送信
+      remote_socket.send(local_buffer)
+      print "[==>] Sent to remote."
+
+    # 応答の受信
+    remote_buffer = receive_from(remote_socket)
+
+    if len(remote_buffer):
+      print "[<==] Received %d bytes from remote." % len(remote_buffer)
+      hexdump(remote_buffer)
+
+      # 受信データ処理関数にデータ受け渡し
+      remote_buffer = response_handler(remote_buffer)
+
+      # ローカル側に応答データを送信
+      client_socket.send(remote_buffer)
+
+      print "[<==] Sent to localhost."
+
+    # ローカル側・リモート側双方からデータが来なければ接続を閉じる
+    if not len(local_buffer) or not len(remote_buffer):
+      client_socket.close()
+      remote_socket.close()
+      print "[*] No more data. Closing connections."
+
+      break
 
 def server_loop(local_host, local_port, remote_host, remote_port, receive_first):
   server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
