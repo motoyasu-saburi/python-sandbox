@@ -37,9 +37,9 @@ def server_loop(local_host, local_port, remote_host, remote_port, receive_first)
 def main():
 
   # コマンドライン引数の解釈
-if len(sys.argv[1:]) != 5:
-  print "Usage: ./proxy.py 127.0.0.1 9000 10.12.132.1 9000 True"
-  sys.exit(0)
+  if len(sys.argv[1:]) != 5:
+    print "Usage: ./proxy.py 127.0.0.1 9000 10.12.132.1 9000 True"
+    sys.exit(0)
 
   # ローカル側での通信待受を行うための設定
   local_host = sys.argv[1]
